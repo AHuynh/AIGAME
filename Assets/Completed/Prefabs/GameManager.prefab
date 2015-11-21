@@ -92,6 +92,8 @@ MonoBehaviour:
   - {fileID: 110520, guid: 7094f72151ec74f569c4e03f1ec0f8e7, type: 2}
   - {fileID: 110520, guid: b0ace21a29149403094422fb3bd96aa9, type: 2}
   - {fileID: 110520, guid: e85c94355cc4641da919bd5d0ac956d4, type: 2}
+  blockTiles:
+  - {fileID: 138320, guid: efc757259c3ada34abf3be743c5aea73, type: 2}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -100,6 +102,10 @@ Prefab:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 0}
+      propertyPath: blockTiles.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
       propertyPath: columns
       value: 20
       objectReference: {fileID: 0}
@@ -107,6 +113,10 @@ Prefab:
       propertyPath: rows
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: blockTiles.Array.data[0]
+      value: 
+      objectReference: {fileID: 138320, guid: efc757259c3ada34abf3be743c5aea73, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 133658}

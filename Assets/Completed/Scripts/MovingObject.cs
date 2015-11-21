@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Completed
 {
@@ -12,11 +13,16 @@ namespace Completed
 		
 		private BoxCollider2D boxCollider; 		//The BoxCollider2D component attached to this object.
 		private Rigidbody2D rb2D;				//The Rigidbody2D component attached to this object.
-		private float inverseMoveTime;			//Used to make movement more efficient.
-		
-		
-		//Protected, virtual functions can be overridden by inheriting classes.
-		protected virtual void Start ()
+		private float inverseMoveTime;          //Used to make movement more efficient.
+
+        public bool canMove = false;
+        public bool moveSelection = false;
+        public bool firstClick = false;
+        public List<GameObject> validMoves = new List<GameObject>();
+        public List<Vector3> validPositions = new List<Vector3>();
+
+        //Protected, virtual functions can be overridden by inheriting classes.
+        protected virtual void Start ()
 		{
 			//Get a component reference to this object's BoxCollider2D
 			boxCollider = GetComponent <BoxCollider2D> ();
@@ -31,35 +37,38 @@ namespace Completed
 		
 		//Move returns true if it is able to move and false if not. 
 		//Move takes parameters for x direction, y direction and a RaycastHit2D to check collision.
-		protected bool Move (int xDir, int yDir, out RaycastHit2D hit)
+		protected int Move (int desX, int desY, List<Vector3> validP)
 		{
-			//Store start position to move from, based on objects current transform position.
-			Vector2 start = transform.position;
-			
-			// Calculate end position based on the direction parameters passed in when calling Move.
-			Vector2 end = start + new Vector2 (xDir, yDir);
-			
-			//Disable the boxCollider so that linecast doesn't hit this object's own collider.
-			boxCollider.enabled = false;
-			
-			//Cast a line from start point to end point checking collision on blockingLayer.
-			hit = Physics2D.Linecast (start, end, blockingLayer);
-			
-			//Re-enable boxCollider after linecast
-			boxCollider.enabled = true;
-			
+            bool valid = false;
+
+            Vector3 des = new Vector3(desX, desY, 0);
+
+            for(int i = 0; i < validP.Count; i++)
+            {
+                if (des == validP[i])
+                    valid = true;
+            }
+
 			//Check if anything was hit
-			if(hit.transform == null)
+			if(valid)
 			{
-				//If nothing was hit, start SmoothMovement co-routine passing in the Vector2 end as destination
-				StartCoroutine (SmoothMovement (end));
-				
-				//Return true to say that Move was successful
-				return true;
+                
+                int fX = (int)transform.position.x;
+                int fY = (int)transform.position.y;
+                int xdif = Mathf.Abs(desX-fX);
+                int ydif = Mathf.Abs(desY - fY);
+                int steps = xdif + ydif;
+                //If nothing was hit, start SmoothMovement co-routine passing in the Vector2 end as destination
+                StartCoroutine (SmoothMovement (des));
+
+                //Return true to say that Move was successful
+                Debug.Log(steps);
+				return steps;
+               
 			}
 			
 			//If something was hit, return false, Move was unsuccesful.
-			return false;
+			return 0;
 		}
 		
 		
@@ -90,14 +99,13 @@ namespace Completed
 		
 		//The virtual keyword means AttemptMove can be overridden by inheriting classes using the override keyword.
 		//AttemptMove takes a generic parameter T to specify the type of component we expect our unit to interact with if blocked (Player for Enemies, Wall for Player).
-		protected virtual void AttemptMove <T> (int xDir, int yDir)
-			where T : Component
+		protected virtual void AttemptMove (int desX, int desY)
 		{
-			//Hit will store whatever our linecast hits when Move is called.
+			/*//Hit will store whatever our linecast hits when Move is called.
 			RaycastHit2D hit;
 			
 			//Set canMove to true if Move was successful, false if failed.
-			bool canMove = Move (xDir, yDir, out hit);
+			bool canMove = Move (desX, , out hit);
 			
 			//Check if nothing was hit by linecast
 			if(hit.transform == null)
@@ -111,7 +119,7 @@ namespace Completed
 			if(!canMove && hitComponent != null)
 				
 				//Call the OnCantMove function and pass it hitComponent as a parameter.
-				OnCantMove (hitComponent);
+				OnCantMove (hitComponent);*/
 		}
 		
 		

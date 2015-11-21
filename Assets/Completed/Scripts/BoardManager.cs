@@ -36,6 +36,7 @@ namespace Completed
 		public GameObject[] foodTiles;									//Array of food prefabs.
 		public GameObject[] enemyTiles;									//Array of enemy prefabs.
 		public GameObject[] outerWallTiles;								//Array of outer tile prefabs.
+        public GameObject[] blockTiles;
 		
 		private Transform boardHolder;									//A variable to store a reference to the transform of our Board object.
 		private List <Vector3> gridPositions = new List <Vector3> ();	//A list of possible locations to place tiles.
@@ -138,19 +139,13 @@ namespace Completed
 			InitialiseList ();
 			
 			//Instantiate a random number of wall tiles based on minimum and maximum, at randomized positions.
-			LayoutObjectAtRandom (wallTiles, wallCount.minimum, wallCount.maximum);
-			
-			//Instantiate a random number of food tiles based on minimum and maximum, at randomized positions.
-			LayoutObjectAtRandom (foodTiles, foodCount.minimum, foodCount.maximum);
+			LayoutObjectAtRandom (blockTiles, wallCount.minimum, wallCount.maximum);
 			
 			//Determine number of enemies based on current level number, based on a logarithmic progression
 			int enemyCount = (int)Mathf.Log(level, 2f);
 			
 			//Instantiate a random number of enemies based on minimum and maximum, at randomized positions.
 			LayoutObjectAtRandom (enemyTiles, enemyCount, enemyCount);
-			
-			//Instantiate the exit tile in the upper right hand corner of our game board
-			Instantiate (exit, new Vector3 (columns - 1, rows - 1, 0f), Quaternion.identity);
 		}
 	}
 }

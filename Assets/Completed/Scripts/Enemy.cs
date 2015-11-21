@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Completed
 {
@@ -13,11 +14,11 @@ namespace Completed
 		
 		private Animator animator;							//Variable of type Animator to store a reference to the enemy's Animator component.
 		private Transform target;							//Transform to attempt to move toward each turn.
-		private bool skipMove;								//Boolean to determine whether or not enemy should skip a turn or move this turn.
-		
-		
-		//Start overrides the virtual Start function of the base class.
-		protected override void Start ()
+		private bool skipMove;                              //Boolean to determine whether or not enemy should skip a turn or move this turn.
+
+
+        //Start overrides the virtual Start function of the base class.
+        protected override void Start ()
 		{
 			//Register this enemy with our instance of GameManager by adding it to a list of Enemy objects. 
 			//This allows the GameManager to issue movement commands.
@@ -36,7 +37,7 @@ namespace Completed
 		
 		//Override the AttemptMove function of MovingObject to include functionality needed for Enemy to skip turns.
 		//See comments in MovingObject for more on how base AttemptMove function works.
-		protected override void AttemptMove <T> (int xDir, int yDir)
+		protected override void AttemptMove (int xDir, int yDir)
 		{
 			//Check if skipMove is true, if so set it to false and skip this turn.
 			if(skipMove)
@@ -47,7 +48,7 @@ namespace Completed
 			}
 			
 			//Call the AttemptMove function from MovingObject.
-			base.AttemptMove <T> (xDir, yDir);
+			base.AttemptMove (xDir, yDir);
 			
 			//Now that Enemy has moved, set skipMove to true to skip next move.
 			skipMove = true;
@@ -74,7 +75,7 @@ namespace Completed
 				xDir = target.position.x > transform.position.x ? 1 : -1;
 			
 			//Call the AttemptMove function and pass in the generic parameter Player, because Enemy is moving and expecting to potentially encounter a Player
-			AttemptMove <Player> (xDir, yDir);
+			AttemptMove (xDir, yDir);
 		}
 		
 		

@@ -8,6 +8,8 @@ TagManager:
   - Exit
   - Enemy
   - Soda
+  - Floor
+  - Blocks
   layers:
   - Default
   - TransparentFX
