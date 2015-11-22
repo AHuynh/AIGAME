@@ -25,9 +25,14 @@ namespace Completed
 		private int food;							//Used to store player food points total during level.
 		private Vector2 touchOrigin = -Vector2.one;	//Used to store location of screen touch origin for mobile controls.
 
-        static private int moveRange = 20;
-        private int stepsLeft = moveRange;
-        public Text stepsLeftText;
+        private int moveRange = 5;
+        private int stepsLeft = 5;
+        private Text stepsLeftText;
+        private Button endAction;
+        private bool myTurn;
+
+        public GameManager GM;
+
 
         /*private bool canMove = false;
         private bool moveSelection = false;
@@ -46,10 +51,13 @@ namespace Completed
 			//Get the current food point total stored in GameManager.instance between levels.
 			food = GameManager.instance.playerFoodPoints;
 			
-			//Set the foodText to reflect the current player food total.
-			foodText.text = "Food: " + food;
-			stepsLeftText.text = "Steps Left: "+stepsLeft;
+            stepsLeftText = GameObject.Find("StepsText").GetComponent<Text>();
 
+            endAction = GameObject.Find("EndTurn").GetComponent<Button>();
+
+            GM = GameObject.FindObjectOfType<GameManager>();
+
+            myTurn = true;
 			//Call the Start function of the MovingObject base class.
 			base.Start ();
 		}
@@ -64,20 +72,25 @@ namespace Completed
 		
 		void OnMouseDown()
         {
-            Debug.Log("player selected");
-            if (!moveSelection)
+            if (myTurn)
             {
-                Debug.Log("move phase");
-                if (stepsLeft > 0)
+                GM.setCurPlayer(this);
+                Debug.Log("player selected");
+                stepsLeftText.text = "Steps Left: " + stepsLeft;
+                if (!moveSelection)
                 {
-                    validMoves = showValidTiles(stepsLeft);
-                    canMove = true;
-                    firstClick = true;
+                    Debug.Log("move phase");
+                    if (stepsLeft > 0)
+                    {
+                        validMoves = showValidTiles(stepsLeft);
+                        canMove = true;
+                        firstClick = true;
+                    }
+                    moveSelection = true;
                 }
-                moveSelection = true;
+                else
+                    moveSelection = false;
             }
-            else
-                moveSelection = false;
 
             /*
             Debug.Log("(" + curX + "," + curY + ")");
@@ -92,6 +105,12 @@ namespace Completed
             }*/
         }
 
+        public void endPlayerTurn()
+        {
+            Debug.Log("heihei");
+            myTurn = false;
+        }
+
         private List<GameObject> showValidTiles(int stepsLeft)
         {
             GameObject[] floors;
@@ -99,7 +118,7 @@ namespace Completed
             floors = GameObject.FindGameObjectsWithTag("Floor");
             int curX = (int)transform.position.x;
             int curY = (int)transform.position.y;
-            
+
             for (int i = 0; i < floors.Length; i++)
             {
                 int fX = (int)floors[i].transform.position.x;
@@ -196,7 +215,7 @@ namespace Completed
 
 			
 			//Set the playersTurn boolean of GameManager to false now that players turn is over.
-			GameManager.instance.playersTurn = false;
+			//GameManager.instance.playersTurn = false;
 		}
 		
 		

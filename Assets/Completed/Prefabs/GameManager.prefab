@@ -12,7 +12,7 @@ GameObject:
   - 114: {fileID: 11433658}
   m_Layer: 0
   m_Name: GameManager
-  m_TagString: Untagged
+  m_TagString: GameManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -44,6 +44,8 @@ MonoBehaviour:
   turnDelay: .100000001
   playerFoodPoints: 100
   playersTurn: 1
+  curPlayer: {fileID: 0}
+  players: []
 --- !u!114 &11433658
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -86,8 +88,7 @@ MonoBehaviour:
   - {fileID: 110520, guid: ad25a4e752915438e9f55a35bedacf1f, type: 2}
   - {fileID: 110520, guid: 46e8bf4bf645a47e3ae1b60c7e18418c, type: 2}
   enemyTiles:
-  - {fileID: 161064, guid: 089a2f2c322ea40f9afdfaba0550c6d3, type: 2}
-  - {fileID: 195068, guid: ebfba08a213d34c46ba2b1947aeaea83, type: 2}
+  - {fileID: 146652, guid: 28b53fc28d3a140c392f0e2d919f9de1, type: 2}
   outerWallTiles:
   - {fileID: 110520, guid: 7094f72151ec74f569c4e03f1ec0f8e7, type: 2}
   - {fileID: 110520, guid: b0ace21a29149403094422fb3bd96aa9, type: 2}
@@ -106,6 +107,10 @@ Prefab:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 0}
+      propertyPath: enemyTiles.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
       propertyPath: columns
       value: 20
       objectReference: {fileID: 0}
@@ -117,6 +122,18 @@ Prefab:
       propertyPath: blockTiles.Array.data[0]
       value: 
       objectReference: {fileID: 138320, guid: efc757259c3ada34abf3be743c5aea73, type: 2}
+    - target: {fileID: 0}
+      propertyPath: enemyTiles.Array.data[1]
+      value: 
+      objectReference: {fileID: 195068, guid: ebfba08a213d34c46ba2b1947aeaea83, type: 2}
+    - target: {fileID: 0}
+      propertyPath: enemyTiles.Array.data[0]
+      value: 
+      objectReference: {fileID: 146652, guid: 28b53fc28d3a140c392f0e2d919f9de1, type: 2}
+    - target: {fileID: 0}
+      propertyPath: m_TagString
+      value: GameManager
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 133658}

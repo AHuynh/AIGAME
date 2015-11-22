@@ -24,7 +24,8 @@ namespace Completed
         private bool enemiesMoving;                             //Boolean to check if enemies are moving.
         private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
 
-
+        public Player curPlayer;
+        public List<Player> players;
 
         //Awake is always called before any Start functions
         void Awake()
@@ -54,6 +55,17 @@ namespace Completed
             InitGame();
         }
 
+        public void endTurn()
+        {
+            Debug.Log("haha");
+            curPlayer.endPlayerTurn();
+        }
+
+        public void setCurPlayer(Player p)
+        {
+            curPlayer = p;
+        }
+
         //This is called each time a scene is loaded.
         void OnLevelWasLoaded(int index)
         {
@@ -79,7 +91,8 @@ namespace Completed
             levelText.text = "Day " + level;
 
             //Set levelImage to active blocking player's view of the game board during setup.
-            levelImage.SetActive(true);
+            levelImage.SetActive(false);
+            doingSetup = false;
 
             //Call the HideLevelImage function with a delay in seconds of levelStartDelay.
             Invoke("HideLevelImage", levelStartDelay);

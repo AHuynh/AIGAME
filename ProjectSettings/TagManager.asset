@@ -10,6 +10,7 @@ TagManager:
   - Soda
   - Floor
   - Blocks
+  - GameManager
   layers:
   - Default
   - TransparentFX
