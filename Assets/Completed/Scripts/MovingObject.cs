@@ -11,8 +11,8 @@ namespace Completed
         public LayerMask blockingLayer;         //Layer on which collision will be checked.
 
 
-        private BoxCollider2D boxCollider;      //The BoxCollider2D component attached to this object.
-        private Rigidbody2D rb2D;               //The Rigidbody2D component attached to this object.
+        public BoxCollider boxCollider;      //The BoxCollider2D component attached to this object.
+        public Rigidbody rb2D;               //The Rigidbody2D component attached to this object.
         private float inverseMoveTime;          //Used to make movement more efficient.
 
         public bool canMove = false;
@@ -21,14 +21,17 @@ namespace Completed
         public List<GameObject> validMoves = new List<GameObject>();
         public List<Vector3> validPositions = new List<Vector3>();
 
+        public List<GameObject> validAttack = new List<GameObject>();
+
+
         //Protected, virtual functions can be overridden by inheriting classes.
         protected virtual void Start()
         {
             //Get a component reference to this object's BoxCollider2D
-            boxCollider = GetComponent<BoxCollider2D>();
+            boxCollider = GetComponent<BoxCollider>();
 
             //Get a component reference to this object's Rigidbody2D
-            rb2D = GetComponent<Rigidbody2D>();
+            rb2D = GetComponent<Rigidbody>();
 
             //By storing the reciprocal of the move time we can use it by multiplying instead of dividing, this is more efficient.
             inverseMoveTime = 1f / moveTime;
@@ -45,8 +48,10 @@ namespace Completed
 
             for (int i = 0; i < validP.Count; i++)
             {
-                if (des == validP[i])
+                if (des == validP[i]) {
                     valid = true;
+                    break;
+                }
             }
 
             //Check if anything was hit
@@ -83,11 +88,11 @@ namespace Completed
             while (sqrRemainingDistance > float.Epsilon)
             {
                 //Find a new position proportionally closer to the end, based on the moveTime
+                Debug.Log(rb2D.position+" "+end);
                 Vector3 newPostion = Vector3.MoveTowards(rb2D.position, end, inverseMoveTime * Time.deltaTime);
-
+                Debug.Log(newPostion);
                 //Call MovePosition on attached Rigidbody2D and move it to the calculated position.
                 rb2D.MovePosition(newPostion);
-
                 //Recalculate the remaining distance after moving.
                 sqrRemainingDistance = (transform.position - end).sqrMagnitude;
 

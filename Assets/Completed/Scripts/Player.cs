@@ -25,11 +25,13 @@ namespace Completed
 		private int food;							//Used to store player food points total during level.
 		private Vector2 touchOrigin = -Vector2.one;	//Used to store location of screen touch origin for mobile controls.
 
-        private int moveRange = 5;
-        private int stepsLeft = 5;
+        private int moveRange = 100;
+        private int stepsLeft = 100;
         private Text stepsLeftText;
         private Button endAction;
         private bool myTurn;
+        private bool movingPhase;
+        private bool attackPhase;
 
         public GameManager GM;
 
@@ -58,6 +60,9 @@ namespace Completed
             GM = GameObject.FindObjectOfType<GameManager>();
 
             myTurn = true;
+            movingPhase = true;
+            attackPhase = true;
+
 			//Call the Start function of the MovingObject base class.
 			base.Start ();
 		}
@@ -72,17 +77,18 @@ namespace Completed
 		
 		void OnMouseDown()
         {
-            if (myTurn)
+            if (myTurn&&(GM.curPlayer==null|| GM.curPlayer == this))
             {
+                Debug.Log(this.GetType());
                 GM.setCurPlayer(this);
-                Debug.Log("player selected");
-                stepsLeftText.text = "Steps Left: " + stepsLeft;
+                validMoves = showValidTiles(stepsLeft);
+                validAttack = showValidAttack();
                 if (!moveSelection)
                 {
                     Debug.Log("move phase");
                     if (stepsLeft > 0)
                     {
-                        validMoves = showValidTiles(stepsLeft);
+                        
                         canMove = true;
                         firstClick = true;
                     }
@@ -91,24 +97,13 @@ namespace Completed
                 else
                     moveSelection = false;
             }
-
-            /*
-            Debug.Log("(" + curX + "," + curY + ")");
-            for (int desX = curX - moveRange; desX < curX+moveRange+1; desX++)
-            {
-                int stepsLeft = moveRange - Mathf.Abs(curX - desX);
-
-                for (int desY = curY - stepsLeft; desY<curY+stepsLeft+1; desY++)
-                {
-                    Debug.Log("(" + desX + "," + desY + ")");
-                }
-            }*/
         }
 
         public void endPlayerTurn()
         {
             Debug.Log("heihei");
             myTurn = false;
+            GM.curPlayer = null;
         }
 
         private List<GameObject> showValidTiles(int stepsLeft)
@@ -132,7 +127,6 @@ namespace Completed
                     Vector3 rayDes = new Vector3(fX, fY, 0.1f);
                     Vector3 rayDir = (rayDes - rayOrigin).normalized;
                     Ray ray = new Ray(rayOrigin,rayDir);
-                    Debug.DrawRay(new Vector3(10, 10, -10), new Vector3(fX, fY, 1));
                     Debug.Log(rayOrigin + " " + rayDes + " " + Physics.Raycast(ray));
                     if (!Physics.Raycast(ray)) { 
                         SpriteRenderer renderer = floors[i].GetComponent<SpriteRenderer>();
@@ -150,14 +144,49 @@ namespace Completed
             return validFloors;
         }
 
-        private void resetValidTiles(List<GameObject> fls)
+        private List<GameObject> showValidAttack()
         {
-            for (int i = 0; i< fls.Count; i++){
-                SpriteRenderer renderer = fls[i].GetComponent<SpriteRenderer>();
+            List<GameObject> valid = new List<GameObject>();
+            int curX = (int)transform.position.x;
+            int curY = (int)transform.position.y;
+            Vector3 cur = new Vector3(10, 10, -100);
+            List<Vector3> list = new List<Vector3>();
+            list.Add(new Vector3(curX, curY + 1,0.1f));
+            list.Add(new Vector3(curX, curY - 1,0.1f));
+            list.Add(new Vector3(curX-1, curY,0.1f));
+            list.Add(new Vector3(curX+1, curY,0.1f));
+            for (int i = 0; i < list.Count; i++)
+            {
+                RaycastHit hit;
+                Ray ray = new Ray(cur, (list[i] - cur).normalized);
+                if (Physics.Raycast(ray,out hit))
+                {
+                    GameObject target = hit.collider.gameObject;
+                    if (target.tag == "Player")
+                    {
+                        valid.Add(hit.collider.gameObject);
+                        SpriteRenderer sr = target.GetComponent<SpriteRenderer>();
+                        sr.color = new Color(0f, 0f, 0f, 1f);
+                    }
+                }
+            }
+            return valid;
+        }
+
+        private void resetValidTiles()
+        {
+            for (int i = 0; i< validMoves.Count; i++){
+                SpriteRenderer renderer = validMoves[i].GetComponent<SpriteRenderer>();
+                renderer.color = new Color(1f, 1f, 1f, 1f);
+            }
+            for (int i = 0; i < validAttack.Count; i++)
+            {
+                SpriteRenderer renderer = validAttack[i].GetComponent<SpriteRenderer>();
                 renderer.color = new Color(1f, 1f, 1f, 1f);
             }
             validMoves.Clear();
             validPositions.Clear();
+            validAttack.Clear();
         }
 
 		private void Update ()
@@ -177,8 +206,7 @@ namespace Completed
                     Debug.Log("Pressed left click.");
                     Vector3 posVec = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     desX = Mathf.RoundToInt(posVec.x);
-                    desY = Mathf.RoundToInt(posVec.y);
-                    
+                    desY = Mathf.RoundToInt(posVec.y);                   
                 }
             }
             if (Input.GetMouseButtonDown(0))
@@ -186,16 +214,45 @@ namespace Completed
                 firstClick = false;
 
             }
-                
+
             //Check if we have a non-zero value for horizontal or vertical
             if (desX != -100 && desY != -100)
-			{
-				//Call AttemptMove passing in the generic parameter Wall, since that is what Player may interact with if they encounter one (by attacking it)
-				//Pass in horizontal and vertical as parameters to specify the direction to move Player in.
-				AttemptMove (desX, desY);
+            {
+                if (!attack(desX,desY)) {
+                    Debug.Log("attackfail");
+                //Call AttemptMove passing in the generic parameter Wall, since that is what Player may interact with if they encounter one (by attacking it)
+                //Pass in horizontal and vertical as parameters to specify the direction to move Player in.
+                    AttemptMove(desX, desY);
+                }
 			}
 		}
 		
+        private bool attack(int x,int y)
+        {
+            bool valid = false;
+            GameObject target=null;
+            Vector3 des = new Vector3(x, y, 0);
+
+            for (int i = 0; i < validAttack.Count; i++)
+            {
+                if (des == validAttack[i].transform.position) {
+                    valid = true;
+                    target = validAttack[i];
+                    break;
+                }
+            }
+
+            if (valid)
+            {
+                Destroy(target);
+                resetValidTiles();
+                endPlayerTurn();
+            }
+
+            return valid;
+        }
+
+
 		//AttemptMove overrides the AttemptMove function in the base class MovingObject
 		//AttemptMove takes a generic parameter T which for Player will be of the type Wall, it also takes integers for x and y direction to move in.
 		protected override void AttemptMove (int xDir, int yDir)
@@ -208,7 +265,7 @@ namespace Completed
                 stepsLeftText.text = "Steps Left: " + stepsLeft;
             }
             
-            resetValidTiles(validMoves);
+            resetValidTiles();
             canMove = false;
             moveSelection = false;
 
