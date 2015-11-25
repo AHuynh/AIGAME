@@ -24,9 +24,10 @@ namespace Completed
         private bool enemiesMoving;                             //Boolean to check if enemies are moving.
         private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
 
-        public Player curPlayer;
-        public List<Player> players;
-
+        public int curTeam;
+        public List<Player> player0;
+        public List<Player> player1;
+        public Player captain;
         //Awake is always called before any Start functions
         void Awake()
         {
@@ -58,12 +59,34 @@ namespace Completed
         public void endTurn()
         {
             Debug.Log("haha");
-            curPlayer.endPlayerTurn();
+            if (curTeam == 0)
+            {
+                setTurn(player1, true);
+                setTurn(player0, false);
+            }
+            else {
+                setTurn(player0, true);
+                setTurn(player1, false);
+            }
+            captain.endPlayerTurn();
         }
 
-        public void setCurPlayer(Player p)
+        /* 
+         * Makes way more sense to make another class to store teams, but I'm just trying to get something working for now and this was easy
+         */ 
+        public void setTurn(List<Player> stuff, bool set)
         {
-            curPlayer = p;
+            foreach(Player temp in stuff)
+            {
+                temp.myTurn = set;
+            }
+        }
+        public void setCurTeam(int team)
+        {
+            curTeam = team;
+            if (curTeam == 0)
+                captain = player0[0];
+            else captain = player1[0];
         }
 
         //This is called each time a scene is loaded.

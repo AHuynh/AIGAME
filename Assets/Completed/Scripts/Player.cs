@@ -30,7 +30,7 @@ namespace Completed
         private int stepsLeft = 10;
         private Text stepsLeftText;
         private Button endAction;
-        private bool myTurn;
+        public bool myTurn;
         private bool movingPhase;
         private bool attackPhase;
 
@@ -60,9 +60,16 @@ namespace Completed
 
             GM = GameObject.FindObjectOfType<GameManager>();
 
-            myTurn = true;
+            myTurn = false;
             movingPhase = true;
             attackPhase = true;
+
+            if (team == 0)
+            {
+                this.myTurn = true;
+                GM.player0.Add(this);
+            }
+            else GM.player1.Add(this);
 
 			//Call the Start function of the MovingObject base class.
 			base.Start ();
@@ -78,10 +85,10 @@ namespace Completed
 		
 		void OnMouseDown()
         {
-            if (myTurn&&(GM.curPlayer==null|| GM.curPlayer == this))
+            if (myTurn)//   &&  (GM.curPlayer==null|| GM.curPlayer == this))
             {
                 Debug.Log(this.GetType());
-                GM.setCurPlayer(this);
+                GM.setCurTeam(team);
                 validMoves = showValidTiles(stepsLeft);
                 validAttack = showValidAttack();
                 if (!moveSelection)
@@ -103,8 +110,8 @@ namespace Completed
         public void endPlayerTurn()
         {
             Debug.Log("heihei");
-            myTurn = false;
-            GM.curPlayer = null;
+            myTurn = false; 
+            GM.curTeam = ~team;
         }
 
         private List<GameObject> showValidTiles(int stepsLeft)
