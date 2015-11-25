@@ -20,13 +20,14 @@ namespace Completed
 		public AudioClip drinkSound1;				//1 of 2 Audio clips to play when player collects a soda object.
 		public AudioClip drinkSound2;				//2 of 2 Audio clips to play when player collects a soda object.
 		public AudioClip gameOverSound;				//Audio clip to play when player dies.
+        public int team;                          //player 1 or 2
 		
 		private Animator animator;					//Used to store a reference to the Player's animator component.
 		private int food;							//Used to store player food points total during level.
 		private Vector2 touchOrigin = -Vector2.one;	//Used to store location of screen touch origin for mobile controls.
 
         private int moveRange = 100;
-        private int stepsLeft = 100;
+        private int stepsLeft = 10;
         private Text stepsLeftText;
         private Button endAction;
         private bool myTurn;
@@ -130,7 +131,7 @@ namespace Completed
                     Debug.Log(rayOrigin + " " + rayDes + " " + Physics.Raycast(ray));
                     if (!Physics.Raycast(ray)) { 
                         SpriteRenderer renderer = floors[i].GetComponent<SpriteRenderer>();
-                        renderer.color = new Color(0f, 0f, 0f, 1f);
+                        renderer.color = Color.green;
                         validFloors.Add(floors[i]);
                         validPositions.Add(floors[i].transform.position);
                     }
@@ -162,11 +163,16 @@ namespace Completed
                 if (Physics.Raycast(ray,out hit))
                 {
                     GameObject target = hit.collider.gameObject;
+                   
                     if (target.tag == "Player")
                     {
-                        valid.Add(hit.collider.gameObject);
-                        SpriteRenderer sr = target.GetComponent<SpriteRenderer>();
-                        sr.color = new Color(0f, 0f, 0f, 1f);
+                        Player current = target.gameObject.GetComponent<Player>();
+                        if (this.team != current.team)
+                        {
+                            valid.Add(hit.collider.gameObject);
+                            SpriteRenderer sr = target.GetComponent<SpriteRenderer>();
+                            sr.color = new Color(0f, 0f, 0f, 1f);
+                        }
                     }
                 }
             }
@@ -262,7 +268,7 @@ namespace Completed
             if (stepsTaken > 0)
             {
                 stepsLeft -= stepsTaken;
-                stepsLeftText.text = "Steps Left: " + stepsLeft;
+                stepsLeftText.text = "Moves remaining: " + stepsLeft;
             }
             
             resetValidTiles();

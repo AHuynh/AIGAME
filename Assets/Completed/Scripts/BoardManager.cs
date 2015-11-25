@@ -34,8 +34,9 @@ namespace Completed
 		public GameObject[] floorTiles;									//Array of floor prefabs.
 		public GameObject[] wallTiles;									//Array of wall prefabs.
 		public GameObject[] foodTiles;									//Array of food prefabs.
-		public GameObject[] enemyTiles;									//Array of enemy prefabs.
-		public GameObject[] outerWallTiles;								//Array of outer tile prefabs.
+		public GameObject[] playerTiles;									//Array of enemy prefabs.
+        public GameObject[] enemyTiles;
+        public GameObject[] outerWallTiles;								//Array of outer tile prefabs.
         public GameObject[] blockTiles;
 		
 		private Transform boardHolder;									//A variable to store a reference to the transform of our Board object.
@@ -142,10 +143,11 @@ namespace Completed
 			LayoutObjectAtRandom (blockTiles, wallCount.minimum, wallCount.maximum);
 			
 			//Determine number of enemies based on current level number, based on a logarithmic progression
-			int enemyCount = 2;
+			int enemyCount = 3;
 			
 			//Instantiate a random number of enemies based on minimum and maximum, at randomized positions.
 			LayoutObjectAtRandom (enemyTiles, enemyCount, enemyCount);
-		}
+            LayoutObjectAtRandom (playerTiles, enemyCount, enemyCount);
+        }
 	}
 }

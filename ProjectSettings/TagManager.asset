@@ -11,6 +11,7 @@ TagManager:
   - Floor
   - Blocks
   - GameManager
+  - Player2
   layers:
   - Default
   - TransparentFX

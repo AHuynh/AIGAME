@@ -87,7 +87,13 @@ MonoBehaviour:
   foodTiles:
   - {fileID: 110520, guid: ad25a4e752915438e9f55a35bedacf1f, type: 2}
   - {fileID: 110520, guid: 46e8bf4bf645a47e3ae1b60c7e18418c, type: 2}
+  playerTiles:
+  - {fileID: 146652, guid: 774e32e424dcb8342966e327a515dc3f, type: 2}
+  - {fileID: 146652, guid: 774e32e424dcb8342966e327a515dc3f, type: 2}
+  - {fileID: 146652, guid: 774e32e424dcb8342966e327a515dc3f, type: 2}
   enemyTiles:
+  - {fileID: 146652, guid: 28b53fc28d3a140c392f0e2d919f9de1, type: 2}
+  - {fileID: 146652, guid: 28b53fc28d3a140c392f0e2d919f9de1, type: 2}
   - {fileID: 146652, guid: 28b53fc28d3a140c392f0e2d919f9de1, type: 2}
   outerWallTiles:
   - {fileID: 110520, guid: 7094f72151ec74f569c4e03f1ec0f8e7, type: 2}
@@ -108,7 +114,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: enemyTiles.Array.size
-      value: 1
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: playerTiles.Array.size
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: columns
@@ -134,6 +144,18 @@ Prefab:
       propertyPath: m_TagString
       value: GameManager
       objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: playerTiles.Array.data[0]
+      value: 
+      objectReference: {fileID: 146652, guid: 774e32e424dcb8342966e327a515dc3f, type: 2}
+    - target: {fileID: 0}
+      propertyPath: playerTiles.Array.data[1]
+      value: 
+      objectReference: {fileID: 146652, guid: 774e32e424dcb8342966e327a515dc3f, type: 2}
+    - target: {fileID: 0}
+      propertyPath: playerTiles.Array.data[2]
+      value: 
+      objectReference: {fileID: 146652, guid: 774e32e424dcb8342966e327a515dc3f, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 133658}
