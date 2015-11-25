@@ -79,6 +79,7 @@ namespace Completed
             foreach(Player temp in stuff)
             {
                 temp.myTurn = set;
+                temp.setSteps(5);
             }
         }
         public void setCurTeam(int team)
