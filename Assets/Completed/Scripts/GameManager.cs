@@ -24,7 +24,7 @@ namespace Completed
         private bool enemiesMoving;                             //Boolean to check if enemies are moving.
         private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
 
-        public int curTeam;
+        public int curTeam = 0;
         public List<Player> player0;
         public List<Player> player1;
         public Player captain;
@@ -58,17 +58,20 @@ namespace Completed
 
         public void endTurn()
         {
-            Debug.Log("haha");
+
+            Debug.Log("Current team: " + curTeam);
             if (curTeam == 0)
             {
                 setTurn(player1, true);
                 setTurn(player0, false);
+                curTeam = 1;
             }
             else {
                 setTurn(player0, true);
                 setTurn(player1, false);
+                curTeam = 0;
             }
-            captain.endPlayerTurn();
+            //captain.endPlayerTurn();
         }
 
         /* 
@@ -80,6 +83,8 @@ namespace Completed
             {
                 temp.myTurn = set;
                 temp.setSteps(5);
+                if (!set)
+                    temp.endPlayerTurn();
             }
         }
         public void setCurTeam(int team)

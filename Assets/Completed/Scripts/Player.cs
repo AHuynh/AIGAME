@@ -113,9 +113,9 @@ namespace Completed
         {
             Debug.Log("heihei");
             myTurn = false;
+            Debug.Log(myTurn + " this should be false");
             resetValidTiles();
-            stepsLeft = 5;
-            GM.curTeam = ~team;
+            stepsLeft = 5;      
         }
 
         public void setSteps(int steps)

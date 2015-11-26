@@ -12,6 +12,7 @@ TagManager:
   - Blocks
   - GameManager
   - Player2
+  - Background
   layers:
   - Default
   - TransparentFX
@@ -22,7 +23,7 @@ TagManager:
   - 
   - 
   - BlockingLayer
-  - 
+  - Background
   - 
   - 
   - 
