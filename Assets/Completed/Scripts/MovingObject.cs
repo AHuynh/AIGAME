@@ -88,9 +88,9 @@ namespace Completed
             while (sqrRemainingDistance > float.Epsilon)
             {
                 //Find a new position proportionally closer to the end, based on the moveTime
-                Debug.Log(rb2D.position+" "+end);
+                //Debug.Log(rb2D.position+" "+end);
                 Vector3 newPostion = Vector3.MoveTowards(rb2D.position, end, inverseMoveTime * Time.deltaTime);
-                Debug.Log(newPostion);
+                //Debug.Log(newPostion);
                 //Call MovePosition on attached Rigidbody2D and move it to the calculated position.
                 rb2D.MovePosition(newPostion);
                 //Recalculate the remaining distance after moving.

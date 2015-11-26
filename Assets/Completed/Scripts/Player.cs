@@ -22,13 +22,14 @@ namespace Completed
         public int health;
         public int attackPower;
         public bool myTurn;
+        public Color myColor;
 
         private Animator animator;					//Used to store a reference to the Player's animator component.
 		private Vector2 touchOrigin = -Vector2.one;	//Used to store location of screen touch origin for mobile controls.
 
 
-        private int moveRange = 5;
-        private int stepsLeft = 15;
+        public int moveRange;
+        public int stepsLeft;
         private Text stepsLeftText;
         private Button endAction;
 
@@ -82,15 +83,19 @@ namespace Completed
 		
 		void OnMouseDown()
         {
+            Debug.Log(myTurn + "the fuck is this shit breh");
             if (myTurn)//   &&  (GM.curPlayer==null|| GM.curPlayer == this))
             {
                 Debug.Log(this.GetType());
                 GM.setCurTeam(team);
-                validMoves = showValidTiles(stepsLeft);
-                validAttack = showValidAttack();
+                if (stepsLeft > 0)
+                {
+                    validMoves = showValidTiles(stepsLeft);
+                    validAttack = showValidAttack();
+                }
                 if (!moveSelection)
                 {
-                    Debug.Log("move phase");
+                    Debug.Log("move phase" + stepsLeft);
                     if (stepsLeft > 0)
                     {
                         
@@ -108,6 +113,7 @@ namespace Completed
         {
             Debug.Log("heihei");
             myTurn = false;
+            resetValidTiles();
             stepsLeft = 5;
             GM.curTeam = ~team;
         }
@@ -118,7 +124,7 @@ namespace Completed
         }
 
         private List<GameObject> showValidTiles(int stepsLeft)
-        {
+        {         
             GameObject[] floors;
             List<GameObject> validFloors=new List<GameObject>();
             floors = GameObject.FindGameObjectsWithTag("Floor");
@@ -138,7 +144,7 @@ namespace Completed
                     Vector3 rayDes = new Vector3(fX, fY, 0.1f);
                     Vector3 rayDir = (rayDes - rayOrigin).normalized;
                     Ray ray = new Ray(rayOrigin,rayDir);
-                    Debug.Log(rayOrigin + " " + rayDes + " " + Physics.Raycast(ray));
+                    //Debug.Log(rayOrigin + " " + rayDes + " " + Physics.Raycast(ray));
                     if (!Physics.Raycast(ray)) { 
                         SpriteRenderer renderer = floors[i].GetComponent<SpriteRenderer>();
                         renderer.color = Color.green;
@@ -147,7 +153,7 @@ namespace Completed
                     }
                     else
                     {
-                        Debug.Log("wall at (" + fX + "," + fY + ")");
+                        //Debug.Log("wall at (" + fX + "," + fY + ")");
                     }
                 }
 
@@ -174,7 +180,7 @@ namespace Completed
                 {
                     GameObject target = hit.collider.gameObject;
                    
-                    if (target.tag == "Player")
+                    if (target.tag == "Player" || target.tag == "Player2")
                     {
                         Player current = target.gameObject.GetComponent<Player>();
                         if (this.team != current.team)
@@ -193,12 +199,16 @@ namespace Completed
         {
             for (int i = 0; i< validMoves.Count; i++){
                 SpriteRenderer renderer = validMoves[i].GetComponent<SpriteRenderer>();
-                renderer.color = new Color(1f, 1f, 1f, 1f);
+                if (renderer.tag == "Player2")
+                    renderer.color = myColor;
+                else renderer.color = new Color(1f, 1f, 1f, 1f);
             }
             for (int i = 0; i < validAttack.Count; i++)
             {
                 SpriteRenderer renderer = validAttack[i].GetComponent<SpriteRenderer>();
-                renderer.color = new Color(1f, 1f, 1f, 1f);
+                if (renderer.tag == "Player2")
+                    renderer.color = Color.red;
+                else renderer.color = new Color(1f, 1f, 1f, 1f);
             }
             validMoves.Clear();
             validPositions.Clear();
