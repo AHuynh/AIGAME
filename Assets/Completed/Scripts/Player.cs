@@ -43,7 +43,7 @@ namespace Completed
         public GameManager GM;
         public GameObject FloatingDamagePrefab;
 
-        
+        public Text damageText;
 
 
 
@@ -57,6 +57,7 @@ namespace Completed
             attackText = GameObject.Find("Attack").GetComponent<Text>();
             healthText = GameObject.Find("Health").GetComponent<Text>();
             endAction = GameObject.Find("EndTurn").GetComponent<Button>();
+            damageText = GameObject.Find("Damage").GetComponent<Text>();
 
             GM = GameObject.FindObjectOfType<GameManager>();
 
@@ -274,7 +275,12 @@ namespace Completed
             {
                 Player toHit = target.gameObject.GetComponent<Player>();
                 toHit.health -= this.attackPower;
-                if(toHit.health <= 0)
+                damageText.text = "-" + this.attackPower;
+                Vector2 pos = Camera.main.WorldToScreenPoint(target.transform.position);
+                Vector2 end = new Vector2(pos.x + 5, pos.y + 20);
+                //Floating damage text
+                StartCoroutine(floatingText(pos, end));
+                if (toHit.health <= 0)
                     Destroy(target);
                 resetValidTiles();
                 endPlayerTurn();
@@ -283,10 +289,37 @@ namespace Completed
             return valid;
         }
 
+        public IEnumerator floatingText(Vector2 start, Vector2 end)
+        {
+            damageText.rectTransform.position = start;
+            damageText.enabled = true;
+            float duration = 2f;
+            float elapsedTime = 0;
+            while (elapsedTime < duration)
+            {
+                float t = elapsedTime / duration; //0 means the animation just started, 1 means it finished
+                damageText.rectTransform.position = Vector2.Lerp(start, end, t);
+                //TODO: make text change colors, maybe
+                //Text.color = Color.Lerp(textStartColor, textEndColor, t);
+                Debug.Log(elapsedTime + " Time");
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
 
-		//AttemptMove overrides the AttemptMove function in the base class MovingObject
-		//AttemptMove takes a generic parameter T which for Player will be of the type Wall, it also takes integers for x and y direction to move in.
-		protected override void AttemptMove (int xDir, int yDir)
+            damageText.enabled = false;
+            yield return null;
+        }
+
+
+        //Kill some time
+        public IEnumerator wait()
+        {
+            yield return new WaitForSeconds(1);
+        }
+
+        //AttemptMove overrides the AttemptMove function in the base class MovingObject
+        //AttemptMove takes a generic parameter T which for Player will be of the type Wall, it also takes integers for x and y direction to move in.
+        protected override void AttemptMove (int xDir, int yDir)
 		{
             //If Move returns true, meaning Player was able to move into an empty space.
             int stepsTaken= Move(xDir, yDir, validPositions);
