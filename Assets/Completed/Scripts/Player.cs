@@ -2,12 +2,14 @@
 using System.Collections;
 using UnityEngine.UI;   //Allows us to use UI.
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
+
 
 namespace Completed
 {
 	//Player inherits from MovingObject, our base class for objects that can move, Enemy also inherits from this.
 	public class Player : MovingObject
-	{
+    {
 		public float restartLevelDelay = 1f;		//Delay time in seconds to restart level.
 		public int wallDamage = 1;					//How much damage a player does to a wall when chopping it.
 		public Text foodText;						//UI Text to display current player food total.
@@ -32,18 +34,16 @@ namespace Completed
         public int stepsLeft;
         private Text stepsLeftText;
         private Button endAction;
+        private Text attackText;
+        private Text healthText;
 
         private bool movingPhase;
         private bool attackPhase;
 
         public GameManager GM;
+        public GameObject FloatingDamagePrefab;
 
-
-        /*private bool canMove = false;
-        private bool moveSelection = false;
-        private bool firstClick = false;
-        private List<GameObject> validMoves=new List<GameObject>();
-        private List<Vector3> validPositions = new List<Vector3>();*/
+        
 
 
 
@@ -54,7 +54,8 @@ namespace Completed
 			animator = GetComponent<Animator>();
 			
             stepsLeftText = GameObject.Find("StepsText").GetComponent<Text>();
-
+            attackText = GameObject.Find("Attack").GetComponent<Text>();
+            healthText = GameObject.Find("Health").GetComponent<Text>();
             endAction = GameObject.Find("EndTurn").GetComponent<Button>();
 
             GM = GameObject.FindObjectOfType<GameManager>();
@@ -90,7 +91,8 @@ namespace Completed
                 GM.setCurTeam(team);
                 if (stepsLeft > 0)
                 {
-                    validMoves = showValidTiles(stepsLeft);
+                    //Move one tile at a time because there are pathing issues when moving multiple tiles at a time, and I don't want to spend the time fixing them.
+                    validMoves = showValidTiles(moveRange);
                     validAttack = showValidAttack();
                 }
                 if (!moveSelection)
@@ -361,6 +363,20 @@ namespace Completed
 				GameManager.instance.GameOver ();
 			}*/
 		}
-	}
+
+        void OnMouseOver()
+        {
+            attackText.text = "AP: " + attackPower;
+            healthText.text = "HP: " + health;
+            if(myTurn)
+            stepsLeftText.text = "Moves remaining: " + stepsLeft;
+        }
+        void OnMouseExit()
+        {
+            attackText.text = "";
+            healthText.text = "";
+            stepsLeftText.text = "";
+        }
+    }
 }
 

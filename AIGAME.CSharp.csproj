@@ -78,6 +78,7 @@
     <Compile Include="Assets\Completed\Scripts\StartButton.cs" />
     <Compile Include="Assets\Completed\Scripts\Wall.cs" />
     <Compile Include="Assets\Completed\Scripts\endButtonOnClick.cs" />
+    <Compile Include="Assets\Completed\Scripts\onMouseHover.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Fonts\OFL.txt" />
