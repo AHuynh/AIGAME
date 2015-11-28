@@ -14,7 +14,7 @@ namespace Completed
         public static GameManager instance = null;              //Static instance of GameManager which allows it to be accessed by any other script.
         [HideInInspector]
         public bool playersTurn = true;     //Boolean to check if it's players turn, hidden in inspector but public.
-
+		public AudioClip gameOverSound;
 
         private Text levelText;                                 //Text to display current level number.
         private GameObject levelImage;                          //Image to block out level as levels are being set up, background for levelText.
@@ -24,10 +24,9 @@ namespace Completed
         private bool enemiesMoving;                             //Boolean to check if enemies are moving.
         private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
 
-        public int curTeam = 0;
-        public List<Player> player0;
-        public List<Player> player1;
-        public Player captain;
+        public Player curPlayer;
+        public List<Player> players;
+
         //Awake is always called before any Start functions
         void Awake()
         {
@@ -58,67 +57,13 @@ namespace Completed
 
         public void endTurn()
         {
-
-            Debug.Log("Current team: " + curTeam);
-            if (curTeam == 0)
-            {
-                setTurn(player1, true);
-                setTurn(player0, false);
-                curTeam = 1;
-            }
-            else {
-                setTurn(player0, true);
-                setTurn(player1, false);
-                curTeam = 0;
-            }         
+            Debug.Log("haha");
+            curPlayer.endPlayerTurn();
         }
 
-        /* 
-         * Makes way more sense to make another class to store teams, but I'm just trying to get something working for now and this was easy
-         */ 
-        public void setTurn(List<Player> stuff, bool set)
+        public void setCurPlayer(Player p)
         {
-            foreach(Player temp in stuff)
-            {
-                temp.myTurn = set;
-                temp.setSteps(5);
-                if (!set)
-                    temp.endPlayerTurn();
-            }
-        }
-        public void setCurTeam(int team)
-        {
-            curTeam = team;
-            if (curTeam == 0)
-                captain = player0[0];
-            else captain = player1[0];
-        }
-
-
-        /*
-         * When a unit dies, remove them from the list
-         * then check for win condition
-         */
-        public void removePlayer(Player dead, int team)
-        {
-            if(team == 0)
-            {
-                player0.Remove(dead);
-                Debug.Log(player0.Count + " player0");
-                if(player0.Count == 0)
-                {
-                    Application.LoadLevel("GameOver");
-                }
-            }
-            else
-            {
-                player1.Remove(dead);
-                if (player1.Count == 0)
-                {
-                    Application.LoadLevel("GameOver");
-                }
-                Debug.Log(player1.Count + " player1");
-            }
+            curPlayer = p;
         }
 
         //This is called each time a scene is loaded.
@@ -174,6 +119,18 @@ namespace Completed
         //Update is called every frame.
         void Update()
         {
+			bool continueGame = true;
+			for (int i = 0; i < players.Count; i++) {
+				continueGame = false;
+				Debug.Log (players[i].alive);
+				if (players[i].alive) {
+					continueGame = true;
+					break;
+				}
+			}
+			if (continueGame == false) {
+					GameOver();
+		    }
             //Check that playersTurn or enemiesMoving or doingSetup are not currently true.
             if (playersTurn || enemiesMoving || doingSetup)
 
@@ -195,6 +152,8 @@ namespace Completed
         //GameOver is called when the player reaches 0 food points
         public void GameOver()
         {
+			SoundManager.instance.PlaySingle (gameOverSound);
+			SoundManager.instance.musicSource.Stop();
             //Set levelText to display number of levels passed and game over message
             levelText.text = "After " + level + " days, you starved.";
 

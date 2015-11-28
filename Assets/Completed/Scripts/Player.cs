@@ -2,15 +2,15 @@
 using System.Collections;
 using UnityEngine.UI;   //Allows us to use UI.
 using System.Collections.Generic;
-using UnityEngine.EventSystems;
-
 
 namespace Completed
 {
 	//Player inherits from MovingObject, our base class for objects that can move, Enemy also inherits from this.
 	public class Player : MovingObject
-    {
+	{
 		public float restartLevelDelay = 1f;		//Delay time in seconds to restart level.
+		public int pointsPerFood = 10;				//Number of points to add to player food points when picking up a food object.
+		public int pointsPerSoda = 20;				//Number of points to add to player food points when picking up a soda object.
 		public int wallDamage = 1;					//How much damage a player does to a wall when chopping it.
 		public Text foodText;						//UI Text to display current player food total.
 		public AudioClip moveSound1;				//1 of 2 Audio clips to play when player moves.
@@ -20,30 +20,25 @@ namespace Completed
 		public AudioClip drinkSound1;				//1 of 2 Audio clips to play when player collects a soda object.
 		public AudioClip drinkSound2;				//2 of 2 Audio clips to play when player collects a soda object.
 		public AudioClip gameOverSound;				//Audio clip to play when player dies.
-        public int team;                          //player 1 or 2
-        public int health;
-        public int attackPower;
-        public bool myTurn;
-        public Color myColor;
-
-        private Animator animator;					//Used to store a reference to the Player's animator component.
+		public bool alive = true;
+		private Animator animator;					//Used to store a reference to the Player's animator component.
+		private int food;							//Used to store player food points total during level.
 		private Vector2 touchOrigin = -Vector2.one;	//Used to store location of screen touch origin for mobile controls.
 
-
-        public int moveRange;
-        public int stepsLeft;
+        private int moveRange = 5;
+        private int stepsLeft = 5;
         private Text stepsLeftText;
         private Button endAction;
-        private Text attackText;
-        private Text healthText;
-
-        private bool movingPhase;
-        private bool attackPhase;
+        private bool myTurn;
 
         public GameManager GM;
-        public GameObject FloatingDamagePrefab;
 
-        public Text damageText;
+
+        /*private bool canMove = false;
+        private bool moveSelection = false;
+        private bool firstClick = false;
+        private List<GameObject> validMoves=new List<GameObject>();
+        private List<Vector3> validPositions = new List<Vector3>();*/
 
 
 
@@ -53,25 +48,16 @@ namespace Completed
 			//Get a component reference to the Player's animator component
 			animator = GetComponent<Animator>();
 			
+			//Get the current food point total stored in GameManager.instance between levels.
+			food = GameManager.instance.playerFoodPoints;
+			
             stepsLeftText = GameObject.Find("StepsText").GetComponent<Text>();
-            attackText = GameObject.Find("Attack").GetComponent<Text>();
-            healthText = GameObject.Find("Health").GetComponent<Text>();
+
             endAction = GameObject.Find("EndTurn").GetComponent<Button>();
-            damageText = GameObject.Find("Damage").GetComponent<Text>();
 
             GM = GameObject.FindObjectOfType<GameManager>();
-
-            myTurn = false;
-            movingPhase = true;
-            attackPhase = true;
-
-            if (team == 0)
-            {
-                this.myTurn = true;
-                GM.player0.Add(this);
-            }
-            else GM.player1.Add(this);
-
+			alive = true;
+            myTurn = true;
 			//Call the Start function of the MovingObject base class.
 			base.Start ();
 		}
@@ -80,28 +66,23 @@ namespace Completed
 		//This function is called when the behaviour becomes disabled or inactive.
 		private void OnDisable ()
 		{
-
+			//When Player object is disabled, store the current local food total in the GameManager so it can be re-loaded in next level.
+			GameManager.instance.playerFoodPoints = food;
 		}
 		
 		void OnMouseDown()
         {
-            Debug.Log(myTurn + "the fuck is this shit breh");
-            if (myTurn)//   &&  (GM.curPlayer==null|| GM.curPlayer == this))
+            if (myTurn)
             {
-                Debug.Log(this.GetType());
-                GM.setCurTeam(team);
-                if (stepsLeft > 0)
-                {
-                    //Move one tile at a time because there are pathing issues when moving multiple tiles at a time, and I don't want to spend the time fixing them.
-                    validMoves = showValidTiles(moveRange);
-                    validAttack = showValidAttack();
-                }
+                GM.setCurPlayer(this);
+                Debug.Log("player selected");
+                stepsLeftText.text = "Steps Left: " + stepsLeft;
                 if (!moveSelection)
                 {
-                    Debug.Log("move phase" + stepsLeft);
+                    Debug.Log("move phase");
                     if (stepsLeft > 0)
                     {
-                        
+                        validMoves = showValidTiles(stepsLeft);
                         canMove = true;
                         firstClick = true;
                     }
@@ -110,24 +91,28 @@ namespace Completed
                 else
                     moveSelection = false;
             }
+
+            /*
+            Debug.Log("(" + curX + "," + curY + ")");
+            for (int desX = curX - moveRange; desX < curX+moveRange+1; desX++)
+            {
+                int stepsLeft = moveRange - Mathf.Abs(curX - desX);
+
+                for (int desY = curY - stepsLeft; desY<curY+stepsLeft+1; desY++)
+                {
+                    Debug.Log("(" + desX + "," + desY + ")");
+                }
+            }*/
         }
 
         public void endPlayerTurn()
         {
-            //Debug.Log("heihei");
+            Debug.Log("heihei");
             myTurn = false;
-            Debug.Log(myTurn + " this should be false");
-            resetValidTiles();
-            stepsLeft = 5;      
-        }
-
-        public void setSteps(int steps)
-        {
-            stepsLeft = steps;
         }
 
         private List<GameObject> showValidTiles(int stepsLeft)
-        {         
+        {
             GameObject[] floors;
             List<GameObject> validFloors=new List<GameObject>();
             floors = GameObject.FindGameObjectsWithTag("Floor");
@@ -147,16 +132,17 @@ namespace Completed
                     Vector3 rayDes = new Vector3(fX, fY, 0.1f);
                     Vector3 rayDir = (rayDes - rayOrigin).normalized;
                     Ray ray = new Ray(rayOrigin,rayDir);
-                    //Debug.Log(rayOrigin + " " + rayDes + " " + Physics.Raycast(ray));
+                    Debug.DrawRay(new Vector3(10, 10, -10), new Vector3(fX, fY, 1));
+                    Debug.Log(rayOrigin + " " + rayDes + " " + Physics.Raycast(ray));
                     if (!Physics.Raycast(ray)) { 
                         SpriteRenderer renderer = floors[i].GetComponent<SpriteRenderer>();
-                        renderer.color = Color.green;
+                        renderer.color = new Color(0f, 0f, 0f, 1f);
                         validFloors.Add(floors[i]);
                         validPositions.Add(floors[i].transform.position);
                     }
                     else
                     {
-                        //Debug.Log("wall at (" + fX + "," + fY + ")");
+                        Debug.Log("wall at (" + fX + "," + fY + ")");
                     }
                 }
 
@@ -164,58 +150,14 @@ namespace Completed
             return validFloors;
         }
 
-        private List<GameObject> showValidAttack()
+        private void resetValidTiles(List<GameObject> fls)
         {
-            List<GameObject> valid = new List<GameObject>();
-            int curX = (int)transform.position.x;
-            int curY = (int)transform.position.y;
-            Vector3 cur = new Vector3(10, 10, -100);
-            List<Vector3> list = new List<Vector3>();
-            list.Add(new Vector3(curX, curY + 1,0.1f));
-            list.Add(new Vector3(curX, curY - 1,0.1f));
-            list.Add(new Vector3(curX-1, curY,0.1f));
-            list.Add(new Vector3(curX+1, curY,0.1f));
-            for (int i = 0; i < list.Count; i++)
-            {
-                RaycastHit hit;
-                Ray ray = new Ray(cur, (list[i] - cur).normalized);
-                if (Physics.Raycast(ray,out hit))
-                {
-                    GameObject target = hit.collider.gameObject;
-                   
-                    if (target.tag == "Player" || target.tag == "Player2")
-                    {
-                        Player current = target.gameObject.GetComponent<Player>();
-                        if (this.team != current.team)
-                        {
-                            valid.Add(hit.collider.gameObject);
-                            SpriteRenderer sr = target.GetComponent<SpriteRenderer>();
-                            sr.color = new Color(0f, 0f, 0f, 1f);
-                        }
-                    }
-                }
-            }
-            return valid;
-        }
-
-        private void resetValidTiles()
-        {
-            for (int i = 0; i< validMoves.Count; i++){
-                SpriteRenderer renderer = validMoves[i].GetComponent<SpriteRenderer>();
-                if (renderer.tag == "Player2")
-                    renderer.color = myColor;
-                else renderer.color = new Color(1f, 1f, 1f, 1f);
-            }
-            for (int i = 0; i < validAttack.Count; i++)
-            {
-                SpriteRenderer renderer = validAttack[i].GetComponent<SpriteRenderer>();
-                if (renderer.tag == "Player2")
-                    renderer.color = Color.red; 
-                else renderer.color = new Color(1f, 1f, 1f, 1f);
+            for (int i = 0; i< fls.Count; i++){
+                SpriteRenderer renderer = fls[i].GetComponent<SpriteRenderer>();
+                renderer.color = new Color(1f, 1f, 1f, 1f);
             }
             validMoves.Clear();
             validPositions.Clear();
-            validAttack.Clear();
         }
 
 		private void Update ()
@@ -235,7 +177,8 @@ namespace Completed
                     Debug.Log("Pressed left click.");
                     Vector3 posVec = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     desX = Mathf.RoundToInt(posVec.x);
-                    desY = Mathf.RoundToInt(posVec.y);                   
+                    desY = Mathf.RoundToInt(posVec.y);
+                    
                 }
             }
             if (Input.GetMouseButtonDown(0))
@@ -243,96 +186,29 @@ namespace Completed
                 firstClick = false;
 
             }
-
+                
             //Check if we have a non-zero value for horizontal or vertical
             if (desX != -100 && desY != -100)
-            {
-                if (!attack(desX,desY)) {
-                    Debug.Log("attackfail");
-                //Call AttemptMove passing in the generic parameter Wall, since that is what Player may interact with if they encounter one (by attacking it)
-                //Pass in horizontal and vertical as parameters to specify the direction to move Player in.
-                    AttemptMove(desX, desY);
-                }
+			{
+				//Call AttemptMove passing in the generic parameter Wall, since that is what Player may interact with if they encounter one (by attacking it)
+				//Pass in horizontal and vertical as parameters to specify the direction to move Player in.
+				AttemptMove (desX, desY);
 			}
 		}
 		
-        private bool attack(int x,int y)
-        {
-            bool valid = false;
-            GameObject target=null;
-            Vector3 des = new Vector3(x, y, 0);
-
-            for (int i = 0; i < validAttack.Count; i++)
-            {
-                if (des == validAttack[i].transform.position) {
-                    valid = true;
-                    target = validAttack[i];
-                    break;
-                }
-            }
-
-            if (valid)
-            {
-                Player toHit = target.gameObject.GetComponent<Player>();
-                toHit.health -= this.attackPower;
-                damageText.text = "-" + this.attackPower;
-                Vector2 pos = Camera.main.WorldToScreenPoint(target.transform.position);
-                Vector2 end = new Vector2(pos.x + 5, pos.y + 20);
-                //Floating damage text TODO: Dynamically add Text object so multiple damage texts can be shown at once
-                StartCoroutine(floatingText(pos, end));
-                if (toHit.health <= 0)
-                {
-                    Destroy(target);
-                    GM.removePlayer(toHit, toHit.team);
-                }
-                resetValidTiles();
-                endPlayerTurn();
-            }
-
-            return valid;
-        }
-
-        public IEnumerator floatingText(Vector2 start, Vector2 end)
-        {
-            damageText.rectTransform.position = start;
-            damageText.enabled = true;
-            float duration = 1f;
-            float elapsedTime = 0;
-            while (elapsedTime < duration)
-            {
-                float t = elapsedTime / duration; //0 means the animation just started, 1 means it finished
-                damageText.rectTransform.position = Vector2.Lerp(start, end, t);
-                //TODO: make text change colors, maybe
-                //Text.color = Color.Lerp(textStartColor, textEndColor, t);
-                //Debug.Log(elapsedTime + " Time");
-                elapsedTime += 2*Time.deltaTime;
-                yield return null;
-            }
-
-            damageText.enabled = false;
-            yield return null;
-        }
-
-
-        //Kill some time
-        public IEnumerator wait()
-        {
-            yield return new WaitForSeconds(1);
-        }
-
-        //AttemptMove overrides the AttemptMove function in the base class MovingObject
-        //AttemptMove takes a generic parameter T which for Player will be of the type Wall, it also takes integers for x and y direction to move in.
-        protected override void AttemptMove (int xDir, int yDir)
+		//AttemptMove overrides the AttemptMove function in the base class MovingObject
+		//AttemptMove takes a generic parameter T which for Player will be of the type Wall, it also takes integers for x and y direction to move in.
+		protected override void AttemptMove (int xDir, int yDir)
 		{
             //If Move returns true, meaning Player was able to move into an empty space.
             int stepsTaken= Move(xDir, yDir, validPositions);
             if (stepsTaken > 0)
             {
                 stepsLeft -= stepsTaken;
-                stepsLeftText.text = "Moves remaining: " + stepsLeft;
+                stepsLeftText.text = "Steps Left: " + stepsLeft;
             }
             
-            resetValidTiles();
+            resetValidTiles(validMoves);
             canMove = false;
             moveSelection = false;
 
@@ -370,7 +246,38 @@ namespace Completed
 				//Disable the player object since level is over.
 				enabled = false;
 			}
-		
+			
+			//Check if the tag of the trigger collided with is Food.
+			else if(other.tag == "Food")
+			{
+				//Add pointsPerFood to the players current food total.
+				food += pointsPerFood;
+				
+				//Update foodText to represent current total and notify player that they gained points
+				foodText.text = "+" + pointsPerFood + " Food: " + food;
+				
+				//Call the RandomizeSfx function of SoundManager and pass in two eating sounds to choose between to play the eating sound effect.
+				SoundManager.instance.RandomizeSfx (eatSound1, eatSound2);
+				
+				//Disable the food object the player collided with.
+				other.gameObject.SetActive (false);
+			}
+			
+			//Check if the tag of the trigger collided with is Soda.
+			else if(other.tag == "Soda")
+			{
+				//Add pointsPerSoda to players food points total
+				food += pointsPerSoda;
+				
+				//Update foodText to represent current total and notify player that they gained points
+				foodText.text = "+" + pointsPerSoda + " Food: " + food;
+				
+				//Call the RandomizeSfx function of SoundManager and pass in two drinking sounds to choose between to play the drinking sound effect.
+				SoundManager.instance.RandomizeSfx (drinkSound1, drinkSound2);
+				
+				//Disable the soda object the player collided with.
+				other.gameObject.SetActive (false);
+			}
 		}
 		
 		
@@ -382,37 +289,33 @@ namespace Completed
 		}
 		
 		
+		//LoseFood is called when an enemy attacks the player.
+		//It takes a parameter loss which specifies how many points to lose.
+		public void LoseFood (int loss)
+		{
+			//Set the trigger for the player animator to transition to the playerHit animation.
+			animator.SetTrigger ("playerHit");
+			
+			//Subtract lost food points from the players total.
+			food -= loss;
+			
+			//Update the food display with the new total.
+			foodText.text = "-"+ loss + " Food: " + food;
+			
+			//Check to see if player is dead
+			//CheckIfDead ();
+		}
+		
 		
 		//CheckIfGameOver checks if the player is out of food points and if so, ends the game.
-		private void CheckIfGameOver ()
+		private void CheckIfDead ()
 		{
-			/*//Check if food point total is less than or equal to zero.
+			//Check if food point total is less than or equal to zero.
 			if (food <= 0) 
 			{
-				//Call the PlaySingle function of SoundManager and pass it the gameOverSound as the audio clip to play.
-				SoundManager.instance.PlaySingle (gameOverSound);
-				
-				//Stop the background music.
-				SoundManager.instance.musicSource.Stop();
-				
-				//Call the GameOver function of GameManager.
-				GameManager.instance.GameOver ();
-			}*/
+				alive = false;
+			}
 		}
-
-        void OnMouseOver()
-        {
-            attackText.text = "AP: " + attackPower;
-            healthText.text = "HP: " + health;
-            if(myTurn)
-            stepsLeftText.text = "Moves remaining: " + stepsLeft;
-        }
-        void OnMouseExit()
-        {
-            attackText.text = "";
-            healthText.text = "";
-            stepsLeftText.text = "";
-        }
-    }
+	}
 }
 

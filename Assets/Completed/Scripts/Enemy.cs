@@ -10,8 +10,8 @@ namespace Completed
 		public int playerDamage; 							//The amount of food points to subtract from the player when attacking.
 		public AudioClip attackSound1;						//First of two audio clips to play when attacking the player.
 		public AudioClip attackSound2;						//Second of two audio clips to play when attacking the player.
-		
-		
+		public int health;
+		public bool alive;
 		private Animator animator;							//Variable of type Animator to store a reference to the enemy's Animator component.
 		private Transform target;							//Transform to attempt to move toward each turn.
 		private bool skipMove;                              //Boolean to determine whether or not enemy should skip a turn or move this turn.
@@ -87,7 +87,7 @@ namespace Completed
 			Player hitPlayer = component as Player;
 			
 			//Call the LoseFood function of hitPlayer passing it playerDamage, the amount of foodpoints to be subtracted.
-			//hitPlayer.LoseFood (playerDamage); TODO: change how enemy attacks work
+			hitPlayer.LoseFood (playerDamage);
 			
 			//Set the attack trigger of animator to trigger Enemy attack animation.
 			animator.SetTrigger ("enemyAttack");
