@@ -70,8 +70,7 @@ namespace Completed
                 setTurn(player0, true);
                 setTurn(player1, false);
                 curTeam = 0;
-            }
-            //captain.endPlayerTurn();
+            }         
         }
 
         /* 
@@ -93,6 +92,33 @@ namespace Completed
             if (curTeam == 0)
                 captain = player0[0];
             else captain = player1[0];
+        }
+
+
+        /*
+         * When a unit dies, remove them from the list
+         * then check for win condition
+         */
+        public void removePlayer(Player dead, int team)
+        {
+            if(team == 0)
+            {
+                player0.Remove(dead);
+                Debug.Log(player0.Count + " player0");
+                if(player0.Count == 0)
+                {
+                    Application.LoadLevel("GameOver");
+                }
+            }
+            else
+            {
+                player1.Remove(dead);
+                if (player1.Count == 0)
+                {
+                    Application.LoadLevel("GameOver");
+                }
+                Debug.Log(player1.Count + " player1");
+            }
         }
 
         //This is called each time a scene is loaded.

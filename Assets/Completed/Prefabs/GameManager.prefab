@@ -44,8 +44,10 @@ MonoBehaviour:
   turnDelay: .100000001
   playerFoodPoints: 100
   playersTurn: 1
-  curPlayer: {fileID: 0}
-  players: []
+  curTeam: 0
+  player0: []
+  player1: []
+  captain: {fileID: 0}
 --- !u!114 &11433658
 MonoBehaviour:
   m_ObjectHideFlags: 1

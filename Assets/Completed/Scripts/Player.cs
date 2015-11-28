@@ -114,7 +114,7 @@ namespace Completed
 
         public void endPlayerTurn()
         {
-            Debug.Log("heihei");
+            //Debug.Log("heihei");
             myTurn = false;
             Debug.Log(myTurn + " this should be false");
             resetValidTiles();
@@ -210,7 +210,7 @@ namespace Completed
             {
                 SpriteRenderer renderer = validAttack[i].GetComponent<SpriteRenderer>();
                 if (renderer.tag == "Player2")
-                    renderer.color = Color.red;
+                    renderer.color = Color.red; 
                 else renderer.color = new Color(1f, 1f, 1f, 1f);
             }
             validMoves.Clear();
@@ -281,7 +281,10 @@ namespace Completed
                 //Floating damage text
                 StartCoroutine(floatingText(pos, end));
                 if (toHit.health <= 0)
+                {
                     Destroy(target);
+                    GM.removePlayer(toHit, toHit.team);
+                }
                 resetValidTiles();
                 endPlayerTurn();
             }
@@ -301,7 +304,7 @@ namespace Completed
                 damageText.rectTransform.position = Vector2.Lerp(start, end, t);
                 //TODO: make text change colors, maybe
                 //Text.color = Color.Lerp(textStartColor, textEndColor, t);
-                Debug.Log(elapsedTime + " Time");
+                //Debug.Log(elapsedTime + " Time");
                 elapsedTime += Time.deltaTime;
                 yield return null;
             }

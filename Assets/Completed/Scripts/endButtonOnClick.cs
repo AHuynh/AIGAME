@@ -10,7 +10,7 @@ public class endButtonOnClick : MonoBehaviour {
 	void Start () {
         gm = GameObject.FindObjectOfType<GameManager>();
 	}
-	
+
     public void endturn()
     {
         gm.endTurn();
@@ -20,4 +20,14 @@ public class endButtonOnClick : MonoBehaviour {
 	void Update () {
 	
 	}
+
+    public void menu()
+    {
+        Application.LoadLevel("Menu");
+    }
+    public void exit()
+    {
+        Application.Quit();
+    }
+
 }

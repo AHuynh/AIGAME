@@ -103,8 +103,8 @@ MonoBehaviour:
   attackPower: 5
   myTurn: 0
   myColor: {r: 1, g: 1, b: 1, a: 0}
-  moveRange: 15
-  stepsLeft: 15
+  moveRange: 1
+  stepsLeft: 5
   GM: {fileID: 0}
   FloatingDamagePrefab: {fileID: 0}
   damageText: {fileID: 0}
@@ -236,7 +236,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: stepsLeft
-      value: 15
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Text
@@ -258,7 +258,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: moveRange
-      value: 15
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_Shadows.m_Type
@@ -284,6 +284,18 @@ Prefab:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 2100000, guid: b284a6525342f44599e9ce79e37c2d61, type: 3}
+    - target: {fileID: 0}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 146652}
