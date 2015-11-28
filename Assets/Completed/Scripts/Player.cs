@@ -278,7 +278,7 @@ namespace Completed
                 damageText.text = "-" + this.attackPower;
                 Vector2 pos = Camera.main.WorldToScreenPoint(target.transform.position);
                 Vector2 end = new Vector2(pos.x + 5, pos.y + 20);
-                //Floating damage text
+                //Floating damage text TODO: Dynamically add Text object so multiple damage texts can be shown at once
                 StartCoroutine(floatingText(pos, end));
                 if (toHit.health <= 0)
                 {
@@ -296,7 +296,7 @@ namespace Completed
         {
             damageText.rectTransform.position = start;
             damageText.enabled = true;
-            float duration = 2f;
+            float duration = 1f;
             float elapsedTime = 0;
             while (elapsedTime < duration)
             {
@@ -305,7 +305,7 @@ namespace Completed
                 //TODO: make text change colors, maybe
                 //Text.color = Color.Lerp(textStartColor, textEndColor, t);
                 //Debug.Log(elapsedTime + " Time");
-                elapsedTime += Time.deltaTime;
+                elapsedTime += 2*Time.deltaTime;
                 yield return null;
             }
 
